@@ -22,6 +22,7 @@ use crate::{
         utils::{is_case_or_default_stmt, is_default_stmt, is_inner_contain_breakstmt},
         Clang, CommomHelper,
     },
+    execution::logger,
     program::gadget::is_library_api,
 };
 use eyre::Result;
@@ -847,7 +848,10 @@ impl CFGBuilder {
                     }
                     block = new_block;
                 }
-                _ => todo!("{:#?} is unimplemented", curr),
+                _ => {
+                    log::warn!("Unsupported stmt, skip: {curr:#?}");
+                    continue;
+                }
             }
         }
 
