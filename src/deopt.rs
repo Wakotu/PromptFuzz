@@ -451,9 +451,13 @@ impl Deopt {
     }
 
     pub fn get_fuzz_wrapper() -> Result<PathBuf> {
-        let path = [Deopt::get_crate_dir()?, config::FDP_PATH, "fuzz_wrapper.cc".into()]
-            .iter()
-            .collect();
+        let path = [
+            Deopt::get_crate_dir()?,
+            config::FDP_PATH,
+            "fuzz_wrapper.cc".into(),
+        ]
+        .iter()
+        .collect();
         Ok(path)
     }
 
@@ -559,6 +563,7 @@ impl Deopt {
             ProgramError::Fuzzer(_) => [save_dir.clone(), "fuzzer".into()].iter().collect(),
             ProgramError::Coverage(_) => [save_dir.clone(), "coverage".into()].iter().collect(),
             ProgramError::Hang(_) => [save_dir.clone(), "hang".into()].iter().collect(),
+            ProgramError::ADGBuild(_) => [save_dir.clone(), "adg_build".into()].iter().collect(),
         };
         utils::create_dir_if_nonexist(&save_dir)?;
         let seed_path: PathBuf = [
@@ -668,10 +673,10 @@ pub mod utils {
             for header in get_library_headers(deopt).unwrap() {
                 if header.ends_with(".h") {
                     content.push_str("extern \"C\" {\n");
-                    content.push_str(&format!("#include <{header}>\n"));            
+                    content.push_str(&format!("#include <{header}>\n"));
                     content.push_str("}\n");
                 } else {
-                    content.push_str(&format!("#include <{header}>\n"));            
+                    content.push_str(&format!("#include <{header}>\n"));
                 }
             }
             content
@@ -733,7 +738,7 @@ pub mod utils {
         })
     }
 
-        /// get the build static library linked with sanitizers
+    /// get the build static library linked with sanitizers
     pub fn get_sancov_lib_path(deopt: &Deopt) -> &'static PathBuf {
         static PATH: OnceCell<PathBuf> = OnceCell::new();
         PATH.get_or_init(|| {

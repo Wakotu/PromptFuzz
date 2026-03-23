@@ -177,8 +177,7 @@ impl Fuzzer {
         if get_config().fuzz_converge_round == 0 {
             return false;
         }
-        if self.quiet_round >= get_config().fuzz_converge_round
-        {
+        if self.quiet_round >= get_config().fuzz_converge_round {
             return true;
         }
         false
@@ -220,7 +219,12 @@ impl Fuzzer {
                 let coverage = self.deopt.get_seed_coverage(program.id)?;
                 let unique_branches = self.observer.has_unique_branch(&coverage);
                 has_new = !unique_branches.is_empty();
-                program.update_quality(unique_branches, &self.deopt)?;
+                if let Err(e) = program.update_quality(unique_branches, &self.deopt) {
+                    logger.log_err(&&crate::execution::logger::ProgramError::ADGBuild(format!(
+                        "Failed to update quality for a program, skipping: {e}"
+                    )));
+                    continue;
+                };
                 self.deopt.update_seed_queue(program, &coverage, has_new)?;
                 self.observer.merge_coverage(&coverage);
             }

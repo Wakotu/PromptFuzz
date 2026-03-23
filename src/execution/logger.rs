@@ -1,5 +1,7 @@
 use std::{
-    path::PathBuf, sync::{RwLock, RwLockReadGuard, RwLockWriteGuard}, time::{self, Instant}
+    path::PathBuf,
+    sync::{RwLock, RwLockReadGuard, RwLockWriteGuard},
+    time::{self, Instant},
 };
 
 use eyre::Result;
@@ -14,6 +16,7 @@ pub enum ProgramError {
     Fuzzer(String),
     Coverage(String),
     Hang(String),
+    ADGBuild(String),
 }
 
 impl ProgramError {
@@ -25,6 +28,7 @@ impl ProgramError {
             ProgramError::Fuzzer(msg) => format!("\nFuzzer Error: \n{msg}"),
             ProgramError::Coverage(msg) => format!("\nCoverage Error: \n{msg}"),
             ProgramError::Hang(msg) => format!("\nExecuted Hang!: \n{msg}"),
+            ProgramError::ADGBuild(msg) => format!("\nADGBuild Error: \n{msg}"),
         }
     }
 }
@@ -195,6 +199,9 @@ impl ProgramLogger {
             ProgramError::Coverage(_) => {
                 self.rc.coverage += 1;
                 self.gc.coverage += 1;
+            }
+            ProgramError::ADGBuild(_) => {
+                // do nothing
             }
         }
     }
