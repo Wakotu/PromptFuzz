@@ -1,11 +1,34 @@
 FROM ubuntu:22.04
 
+
 ENV PATH=/lib/llvm-18/bin:/usr/local/cargo/bin:/root/.cargo/bin:$PATH \ 
     LD_LIBRARY_PATH=/lib/llvm-18/lib \
     RUSTUP_HOME=/usr/local/rustup \
     CARGO_HOME=/usr/local/cargo \
     DEBIAN_FRONTEND=noninteractive \
     DOCKER_CONTAINER=1
+
+RUN apt-get update && apt-get install -y ca-certificates \
+    && update-ca-certificates 
+
+RUN cat > /etc/apt/sources.list <<'EOF'
+# 默认注释了源码镜像以提高 apt update 速度，如有需要可自行取消注释
+deb https://mirrors.bfsu.edu.cn/ubuntu/ jammy main restricted universe multiverse
+# deb-src https://mirrors.bfsu.edu.cn/ubuntu/ jammy main restricted universe multiverse
+deb https://mirrors.bfsu.edu.cn/ubuntu/ jammy-updates main restricted universe multiverse
+# deb-src https://mirrors.bfsu.edu.cn/ubuntu/ jammy-updates main restricted universe multiverse
+deb https://mirrors.bfsu.edu.cn/ubuntu/ jammy-backports main restricted universe multiverse
+# deb-src https://mirrors.bfsu.edu.cn/ubuntu/ jammy-backports main restricted universe multiverse
+
+# 以下安全更新软件源包含了官方源与镜像站配置，如有需要可自行修改注释切换
+# deb-src http://security.ubuntu.com/ubuntu/ jammy-security main restricted universe multiverse
+deb http://security.ubuntu.com/ubuntu/ jammy-security main restricted universe multiverse
+
+# 预发布软件源，不建议启用
+# deb https://mirrors.bfsu.edu.cn/ubuntu/ jammy-proposed main restricted universe multiverse
+# # deb-src https://mirrors.bfsu.edu.cn/ubuntu/ jammy-proposed main restricted universe multiverse
+EOF
+
 
 RUN apt-get update \
     && apt-get -y install build-essential wget curl cmake git unzip patchelf graphviz python3 python3-pip lsb-release bison flex software-properties-common gnupg file libtool binutils autoconf libssl-dev openssl pkg-config libfontconfig libfontconfig1-dev zip libpsl-dev libbrotli-dev libcurl4 tcl \
